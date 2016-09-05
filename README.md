@@ -1,7 +1,5 @@
 # minecraft-server cookbook
 
----
-
 ## Description
 A simple cookbook for installing and maintaining Minecraft servers.
 
