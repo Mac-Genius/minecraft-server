@@ -131,6 +131,7 @@ action :create do
     if node['platform_version'].slice(0, 1).eql? '6'
       template "/etc/init.d/minecraft_#{new_resource.service_name}" do
         source 'minecraft.sh.erb'
+        cookbook 'minecraft-server'
         variables({
                       :user => new_resource.owner,
                       :group => new_resource.group,
@@ -144,6 +145,7 @@ action :create do
     elsif node['platform_version'].slice(0, 1).eql? '7'
       template "/etc/systemd/system/minecraft_#{new_resource.service_name}.service" do
         source 'minecraft.service.erb'
+        cookbook 'minecraft-server'
         variables({
                       :user => new_resource.owner,
                       :group => new_resource.group,
@@ -169,6 +171,7 @@ action :create do
     if node['platform_version'].slice(0, 2).eql? '14'
       template "/etc/init.d/minecraft_#{new_resource.service_name}" do
         source 'minecraft.sh.erb'
+        cookbook 'minecraft-server'
         variables(
           lazy {
             {
@@ -186,6 +189,7 @@ action :create do
     elsif node['platform_version'].slice(0, 2).eql? '16'
       template "/etc/systemd/system/minecraft_#{new_resource.service_name}.service" do
         source 'minecraft.service.erb'
+        cookbook 'minecraft-server'
         variables({
                       :user => new_resource.owner,
                       :group => new_resource.group,
@@ -215,6 +219,7 @@ action :update do
     if node['platform_version'].slice(0, 1).eql? '6'
       template "/etc/init.d/minecraft_#{new_resource.service_name}" do
         source 'minecraft.sh.erb'
+        cookbook 'minecraft-server'
         variables({
                       :user => new_resource.owner,
                       :group => new_resource.group,
@@ -227,6 +232,7 @@ action :update do
     elsif node['platform_version'].slice(0, 1).eql? '7'
       template "/etc/systemd/system/minecraft_#{new_resource.service_name}.service" do
         source 'minecraft.service.erb'
+        cookbook 'minecraft-server'
         variables({
                       :user => new_resource.owner,
                       :group => new_resource.group,
@@ -251,6 +257,7 @@ action :update do
     if node['platform_version'].slice(0, 2).eql? '14'
       template "/etc/init.d/minecraft_#{new_resource.service_name}" do
         source 'minecraft.sh.erb'
+        cookbook 'minecraft-server'
         variables(
           {
             :user => new_resource.owner,
@@ -265,6 +272,7 @@ action :update do
     elsif node['platform_version'].slice(0, 2).eql? '16'
       template "/etc/systemd/system/minecraft_#{new_resource.service_name}.service" do
         source 'minecraft.service.erb'
+        cookbook 'minecraft-server'
         variables({
                       :user => new_resource.owner,
                       :group => new_resource.group,
@@ -293,12 +301,14 @@ action :delete do
     if node['platform_version'].slice(0, 1).eql? '6'
       template "/etc/init.d/minecraft_#{new_resource.service_name}" do
         source 'minecraft.sh.erb'
+        cookbook 'minecraft-server'
         action :delete
         only_if { ::File.exist?("/etc/init.d/minecraft_#{new_resource.service_name}") }
       end
     elsif node['platform_version'].slice(0, 1).eql? '7'
       template "/etc/systemd/system/minecraft_#{new_resource.service_name}.service" do
         source 'minecraft.service.erb'
+        cookbook 'minecraft-server'
         action :delete
         only_if { ::File.exist?("/etc/systemd/system/minecraft_#{new_resource.service_name}.service") }
       end
@@ -317,12 +327,14 @@ action :delete do
     if node['platform_version'].slice(0, 2).eql? '14'
       template "/etc/init.d/minecraft_#{new_resource.service_name}" do
         source 'minecraft.sh.erb'
+        cookbook 'minecraft-server'
         action :delete
         only_if { ::File.exist?("/etc/init.d/minecraft_#{new_resource.service_name}") }
       end
     elsif node['platform_version'].slice(0, 2).eql? '16'
       template "/etc/systemd/system/minecraft_#{new_resource.service_name}.service" do
         source 'minecraft.service.erb'
+        cookbook 'minecraft-server'
         action :delete
         only_if { ::File.exist?("/etc/systemd/system/minecraft_#{new_resource.service_name}.service") }
       end

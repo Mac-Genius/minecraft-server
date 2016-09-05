@@ -24,7 +24,7 @@ It currently supports 3 different type of Minecraft servers:
 
 ## Usage
 
-In your metadata.rb file include this cookbook by putting `cookbook 'minecraft-server', git: 'git://github.com/Mac-Genius/minecraft-server.git'`.
+In your Berksfile include this cookbook by putting `cookbook 'minecraft-server', git: 'git://github.com/Mac-Genius/minecraft-server.git'`. Then inside your metadata.rb file include `depends 'minecraft-server'`.
 
 ### Recipes
 

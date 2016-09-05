@@ -7,3 +7,6 @@ long_description 'Installs/Configures minecraft-server'
 version '0.1.0'
 
 depends 'java', '~> 1.42.0'
+
+source_url 'https://github.com/Mac-Genius/minecraft-server'
+issues_url 'https://github.com/Mac-Genius/minecraft-server/issues'
