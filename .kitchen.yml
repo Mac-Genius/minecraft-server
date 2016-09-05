@@ -1,22 +1,29 @@
 ---
 driver:
-  name: vagrant
+  name: digitalocean
 
 provisioner:
   name: chef_zero
 
-# Uncomment the following verifier to leverage Inspec instead of Busser (the
-# default verifier)
-# verifier:
-#   name: inspec
-#   format: doc
-
 platforms:
-  - name: ubuntu-16.04
-  - name: centos-7.2
-
+  - name: centos-7-2-x64
+    driver_config:
+      size: 2gb
+#  - name: ubuntu-16-04-x64
+#    driver_config:
+#      size: 2gb
+#  - name: ubuntu-14-04-x64
+#    driver_config:
+#      size: 1gb
 suites:
   - name: default
+    server_name: cookbook_test
+    vm_hostname: "#{File.basename(Dir.getwd)}_test_kitchen"
+#    encrypted_data_bag_secret_key_path: test/integration/fixtures/encrypted_data_bag_secret
+#    data_bags_path: test/integration/fixtures/data_bags
     run_list:
       - recipe[minecraft-server::default]
     attributes:
+
+transport:
+  ssh_key: C:/Users/User/.ssh/rsa_key.pem

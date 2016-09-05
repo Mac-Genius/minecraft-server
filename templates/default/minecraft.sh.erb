@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# Source function library.
+. /etc/init.d/functions
+
+SERVICE_USER=<%=@user%>
+SERVICE_NAME=<%=@name%>
+SERVICE_PATH=<%=@directory%>
+PID_PATH_NAME=/tmp/$SERVICE_NAME-pid
+
+function start {
+  if [ ! -f $PID_PATH_NAME ]; then
+    runuser -l $SERVICE_USER -c "cd \"$SERVICE_PATH\" && screen -S $SERVICE_NAME -d -m \"/bin/sh\" -c \"echo \"\$\$\" > $PID_PATH_NAME && exec java -Xms2G -Xmx4G -jar <%=@jar_name%> nogui\""
+    echo "$SERVICE_NAME started..."
+  else
+    echo "$SERVICE_NAME is already running..."
+  fi
+}
+
+function stop {
+  if [ ! -f $PID_PATH_NAME ]; then
+    echo "$SERVICE_NAME is not running..."
+  else
+    runuser -l $SERVICE_USER -c "screen -S $SERVICE_NAME -p 0 -X stuff \"stop\n\""
+    rm $PID_PATH_NAME
+  fi
+}
+
+function status {
+  if [ -f $PID_PATH_NAME ]; then
+    echo "$SERVICE_NAME is running with the id $(cat $PID_PATH_NAME)..."
+  else
+    echo "$SERVICE_NAME is not running..."
+    exit 1
+  fi
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  status)
+    status
+    ;;
+  restart)
+    stop
+    start
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+esac

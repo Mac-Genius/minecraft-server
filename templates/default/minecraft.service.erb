@@ -1,0 +1,14 @@
+[Unit]
+Description=The <%=@name%> Minecraft Server
+
+[Service]
+Type=forking
+User=<%=@user%>
+Group=<%=@group%>
+
+ExecStart=-/usr/bin/screen -dmS minecraft_<%=@name%> sh -c "java -Xms2G -Xmx4G -jar <%=@jar_name%> nogui; exec sh"
+ExecStop=/usr/bin/screen -S minecraft_<%=@name%> -p 0 -X minecraft "stop^M"
+WorkingDirectory=<%=@directory%>
+
+[Install]
+WantedBy=multi-user.target

@@ -1,7 +1,9 @@
 name 'minecraft-server'
-maintainer 'The Authors'
-maintainer_email 'you@example.com'
+maintainer 'John Harrison'
+maintainer_email 'jwharrison007@gmail.com'
 license 'all_rights'
 description 'Installs/Configures minecraft-server'
 long_description 'Installs/Configures minecraft-server'
 version '0.1.0'
+
+depends 'java', '~> 1.42.0'
