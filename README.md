@@ -1,5 +1,24 @@
 # minecraft-server cookbook
 
+## Table of Contents
+
+1. [Description](#description)
+2. [Requirements](#requirements)
+3. [Usage](#usage)
+   1. [Recipes](#recipes)
+   2. [Resources](#resources)
+       * [minecraft_depend](#minecraft_depend)
+       * [minecraft_server](#minecraft_server)
+       * [server_properties](#server_properties)
+       * [minecraft_service](#minecraft_service)
+       * [spigot_server](#spigot_server)
+       * [spigot_yml](#spigot_yml)
+       * [bukkit_server](#bukkit_server)
+       * [bukkit_yml](#bukkit_yml)
+       * [bukkit_plugin](#bukkit_plugin)
+       * [build_tools](#build_tols)
+   3. [Example Usage](#example-usage)
+
 ## Description
 A simple cookbook for installing and maintaining Minecraft servers.
 
@@ -30,6 +49,8 @@ There are no recipes! You can use the custom resources to create a server.
 
 ### Resources
 
+---
+
 #### minecraft_depend
 
 This provides all the dependencies for this cookbook, including Java, screen, unzip, and git.
@@ -48,6 +69,8 @@ This provides all the dependencies for this cookbook, including Java, screen, un
 * `install_unzip`: installs unzip
 * `java_flavor`: what kind of java should be installed (oracle, openjdk, etc.)
 * `java_version`: the java version that should be installed
+
+---
 
 #### minecraft_server
 
@@ -71,6 +94,8 @@ This will setup the vanilla Minecraft server including the service files.
 * `version`: the version of minecraft to install. Defaults to the latest version
 * `world`: a url to a zipped world file
 
+---
+
 #### server_properties
 
 This will update the server properties
@@ -86,6 +111,8 @@ This will update the server properties
 * `group`: the group permission that owns the server files
 * `owner`: the owner permission that owns the server files
 * `path`: the path to the server directory
+
+---
 
 #### minecraft_service
 
@@ -113,6 +140,8 @@ This will create the necessary service files and run, restart, and stop the Mine
 * `jar_name`: the name of the jar excluding the '.jar' at the end
 * `delay`: the amount of time to wait for a server to start or stop
 
+---
+
 #### spigot_server
 
 This will setup the Spigot Minecraft server including the service files.
@@ -136,6 +165,8 @@ This will setup the Spigot Minecraft server including the service files.
 * `world`: a url to a zipped world file
 * `update_jar`: whether to check for a patch for the current version of Spigot
 
+---
+
 #### spigot_yml
 
 This will setup the Spigot server's spigot.yml file.
@@ -152,6 +183,8 @@ This will setup the Spigot server's spigot.yml file.
 * `group`: the group permission that owns the server files
 * `owner`: the owner permission that owns the server files
 * `path`: the path to the server directory
+
+---
 
 #### bukkit_server
 
@@ -176,6 +209,8 @@ This will setup the Bukkit Minecraft server including the service files.
 * `world`: a url to a zipped world file
 * `update_jar`: whether to check for a patch for the current version of Bukkit
 
+---
+
 #### bukkit_yml
 
 This will setup the Bukkit server's spigot.yml file.
@@ -192,6 +227,8 @@ This will setup the Bukkit server's spigot.yml file.
 * `group`: the group permission that owns the server files
 * `owner`: the owner permission that owns the server files
 * `path`: the path to the server directory
+
+---
 
 #### bukkit_plugin
 
@@ -213,9 +250,11 @@ This will install, update, and delete plugins.
 * `version`: the version of the plugin to install. Defaults to the latest version
 * `source`: a url to the jar. Only needed if the plugin is not on Bukkit.org. spigotmc.org/resources links do not work because of Cloudflare!
 
+---
+
 #### build_tools
 
-This will setup BuildTools for creating the Bukkit and Spigot jars
+This will setup BuildTools for creating the Bukkit and Spigot jars. When using the spigot_server/bukkit_server resource, that resource will automatically build the jars. You do not need to use this.
 
 **Actions**
 
@@ -231,6 +270,8 @@ This will setup BuildTools for creating the Bukkit and Spigot jars
 * `source`: the link to BuildTools. defaults to the latest stable version
 * `update_jar`: whether the current version of Spigot or Bukkit should be updated
 * `version`: the version of Spigot or Bukkit to build
+
+---
 
 ### Example Usage
 
