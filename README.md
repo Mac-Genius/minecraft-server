@@ -193,6 +193,26 @@ This will setup the Bukkit server's spigot.yml file.
 * `owner`: the owner permission that owns the server files
 * `path`: the path to the server directory
 
+#### bukkit_plugin
+
+This will install, update, and delete plugins.
+
+**Actions**
+
+* `:install`: installs the Bukkit plugin
+* `:update`: updates the Bukkit plugin
+* `:delete`: removes the Bukkit plugin
+
+**Attributes**
+
+* `id`: the name of the plugin from the url. ex) http://dev.bukkit.org/bukkit-plugins/<plugin-name-here>
+* `group`: the group permission that owns the server files
+* `owner`: the owner permission that owns the server files
+* `path`: the path to the server directory
+* `servers`: a string or list of server names to install, update, or delete a plugin on
+* `version`: the version of the plugin to install. Defaults to the latest version
+* `source`: a url to the jar. Only needed if the plugin is not on Bukkit.org. spigotmc.org/resources links do not work because of Cloudflare!
+
 #### build_tools
 
 This will setup BuildTools for creating the Bukkit and Spigot jars
@@ -322,6 +342,17 @@ spigot_yml 'test' do
       :debug => true
     }
   })
+end
+
+bukkit_plugin 'worldedit' do
+  servers 'test'
+  action :install
+end
+
+bukkit_plugin 'Essentials' do
+  source 'https://hub.spigotmc.org/jenkins/job/spigot-essentials/lastSuccessfulBuild/artifact/Essentials/target/Essentials-2.x-SNAPSHOT.jar'
+  servers 'test'
+  action :install
 end
 
 # starts the server
