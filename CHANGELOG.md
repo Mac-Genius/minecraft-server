@@ -1,5 +1,9 @@
 # minecraft-server cookbook changelog
 
+## Version 0.1.2 (9/15/2016)
+
+* Fix a bug causing the config not to update properly
+
 ## Version 0.1.1 (9/9/2016)
 
 * Add support for installing Bukkit plugins from [bukkit.org](https://www.bukkit.org/)
