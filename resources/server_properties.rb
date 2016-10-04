@@ -80,8 +80,6 @@ action :update do
   ruby_block 'update_config' do
     block do
       old = read_properties("#{new_resource.path}/#{new_resource.name}/server.properties")
-      puts old.to_s
-      puts new_resource.settings.to_s
       new = replace_properties(old, new_resource.settings)
       write_properties("#{new_resource.path}/#{new_resource.name}/server.properties", new)
     end
