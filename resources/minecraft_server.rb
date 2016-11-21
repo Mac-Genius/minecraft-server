@@ -126,7 +126,7 @@ action :create do
     not_if { ::File.exist?("#{new_resource.path}/#{new_resource.name}/minecraft_server.#{new_resource.version}.jar") }
   end
 
-  minecraft_service "#{new_resource.name}" do
+  minecraft_service new_resource.name do
     owner new_resource.owner
     group new_resource.group
     jar_name "minecraft_server.#{currentVersion}"
@@ -136,12 +136,12 @@ action :create do
 
   unless ::File.exist?("#{new_resource.path}/#{new_resource.name}/eula.txt")
     minecraft_service "#{new_resource.name}_start" do
-      service_name "#{new_resource.name}"
+      service_name new_resource.name
       action :start
     end
 
     minecraft_service "#{new_resource.name}_stop" do
-      service_name "#{new_resource.name}"
+      service_name new_resource.name
       action :stop
     end
   end
@@ -157,7 +157,7 @@ action :create do
   unless new_resource.world.eql? ''
     headers = {}
     if ::File.extname(new_resource.world).eql?('') && ::File.basename(new_resource.world).eql?('download')
-      headers = {"Referer" => "#{::File.dirname(new_resource.world)}"}
+      headers = {"Referer" => ::File.dirname(new_resource.world)}
     end
     remote_file "#{new_resource.path}/#{new_resource.name}/world.zip" do
       source new_resource.world
@@ -205,13 +205,13 @@ end
 
 action :update do
   minecraft_service "#{new_resource.name}_stop" do
-    service_name "#{new_resource.name}"
+    service_name new_resource.name
     action :stop
   end
 
   currentVersion = new_resource.version.eql?('latest') ? get_latest_version(new_resource.snapshot) : new_resource.version
 
-  minecraft_service "#{new_resource.name}" do
+  minecraft_service new_resource.name do
     owner new_resource.owner
     group new_resource.group
     jar_name "minecraft_server.#{currentVersion}"
@@ -266,7 +266,7 @@ action :update do
 
       headers = {}
       if ::File.extname(new_resource.world).eql?('') && ::File.basename(new_resource.world).eql?('download')
-        headers = {"Referer" => "#{::File.dirname(new_resource.world)}"}
+        headers = {"Referer" => ::File.dirname(new_resource.world)}
       end
       remote_file "#{new_resource.path}/#{new_resource.name}/world.zip" do
         source new_resource.world
@@ -313,18 +313,18 @@ action :update do
   end
 
   minecraft_service "#{new_resource.name}_start" do
-    service_name "#{new_resource.name}"
+    service_name new_resource.name
     action :start
   end
 end
 
 action :delete do
   minecraft_service "#{new_resource.name}_stop" do
-    service_name "#{new_resource.name}"
+    service_name new_resource.name
     action :stop
   end
 
-  minecraft_service "#{new_resource.name}" do
+  minecraft_service new_resource.name do
     action :delete
   end
 

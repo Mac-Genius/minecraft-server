@@ -14,16 +14,19 @@ default_action :nothing
 
 action :install do
   package 'screen' do
+    package_name 'screen'
     action :install
     only_if { new_resource.install_screen || new_resource.install_all }
   end
 
   package 'unzip' do
+    package_name 'unzip'
     action :install
     only_if { new_resource.install_unzip || new_resource.install_all }
   end
 
   package 'git' do
+    package_name 'git'
     action :install
     only_if { new_resource.install_git || new_resource.install_all }
   end

@@ -75,8 +75,8 @@ module Minecraft_Server
       def get_plugin(id, version)
         doc = get_plugin_page(id)
         plugin_data = {
-            :name => "#{get_plugin_name(doc)}",
-            :author => "#{get_plugin_author(doc)}",
+            :name => get_plugin_name(doc),
+            :author => get_plugin_author(doc),
             :download => get_plugin_link(id, version)
         }
         plugin_data

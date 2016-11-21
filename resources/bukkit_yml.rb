@@ -55,35 +55,33 @@ end
 
 action :update do
   if ::File.exist?("#{new_resource.path}/#{new_resource.name}/bukkit.yml")
-    unless new_resource.settings.empty?
-      ruby_block 'edit bukkit.yml' do
-        block do
-          puts 'here'
-          old = read_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml")
-          puts old.to_s
-          puts new_resource.settings.to_s
-          new = replace_yml(old, new_resource.settings)
-          write_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml", YAML.dump(new))
-        end
+    ruby_block 'edit bukkit.yml' do
+      block do
+        puts 'here'
+        old = read_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml")
+        puts old.to_s
+        puts new_resource.settings.to_s
+        new = replace_yml(old, new_resource.settings)
+        write_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml", YAML.dump(new))
       end
+      not_if { new_resource.settings.empty? }
     end
   else
     minecraft_service "#{new_resource.name}_start" do
-      service_name "#{new_resource.name}"
+      service_name new_resource.name
       action :start
     end
     minecraft_service "#{new_resource.name}_stop" do
-      service_name "#{new_resource.name}"
+      service_name new_resource.name
       action :stop
     end
-    unless new_resource.settings.empty?
-      ruby_block 'edit bukkit.yml' do
-        block do
-          old = read_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml")
-          new = replace_yml(old, new_resource.settings)
-          write_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml", YAML.dump(new))
-        end
+    ruby_block 'edit bukkit.yml' do
+      block do
+        old = read_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml")
+        new = replace_yml(old, new_resource.settings)
+        write_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml", YAML.dump(new))
       end
+      not_if { new_resource.settings.empty? }
     end
   end
 end

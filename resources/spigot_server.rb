@@ -6,6 +6,7 @@ provides :spigot_server
 property :build_tools_dir, String, default: '/opt/build_tools'
 property :eula, [String, TrueClass, FalseClass], default: false
 property :group, String, default: 'chefminecraft'
+property :jar_source, String, default: ''
 property :name, String, name_property: 'default'
 property :owner, String, default: 'chefminecraft'
 property :path, String, default: '/opt/minecraft_servers'
@@ -61,37 +62,50 @@ action :create do
     not_if { ::File.exist?("#{new_resource.path}/#{new_resource.name}") }
   end
 
-  build_tools 'create jar' do
-    version new_resource.version
-    update_jar new_resource.update_jar
-    path new_resource.build_tools_dir
-    owner new_resource.owner
-    group new_resource.group
-    action :build
-  end
+  if new_resource.jar_source.eql? ''
+    build_tools 'create jar' do
+      version new_resource.version
+      update_jar new_resource.update_jar
+      path new_resource.build_tools_dir
+      owner new_resource.owner
+      group new_resource.group
+      action :build
+    end
 
-  ruby_block 'copy jar' do
-    block do
-      ::FileUtils.cp("#{new_resource.build_tools_dir}/spigot-#{node['spigot']['current_version']}.jar", "#{new_resource.path}/#{new_resource.name}")
+    ruby_block 'copy jar' do
+      block do
+        ::FileUtils.cp("#{new_resource.build_tools_dir}/spigot-#{node['spigot']['current_version']}.jar", "#{new_resource.path}/#{new_resource.name}")
+      end
+    end
+  else
+    remote_file "#{new_resource.path}/#{new_resource.name}/spigot.jar" do
+      source new_resource.jar_source
+      owner new_resource.owner
+      group new_resource.group
+      action :create
     end
   end
 
-  minecraft_service "#{new_resource.name}" do
+  minecraft_service new_resource.name do
     owner new_resource.owner
     group new_resource.group
-    jar_name lazy { "spigot-#{node['spigot']['current_version']}" }
+    if new_resource.jar_source.eql? ''
+      jar_name lazy { "spigot-#{node['spigot']['current_version']}" }
+    else
+      jar_name 'spigot'
+    end
     path new_resource.path
     action :create
   end
 
   unless ::File.exist?("#{new_resource.path}/#{new_resource.name}/eula.txt")
     minecraft_service "#{new_resource.name}_start" do
-      service_name "#{new_resource.name}"
+      service_name new_resource.name
       action :start
     end
 
     minecraft_service "#{new_resource.name}_stop" do
-      service_name "#{new_resource.name}"
+      service_name new_resource.name
       action :stop
     end
   end
@@ -107,7 +121,7 @@ action :create do
   unless new_resource.world.eql? ''
     headers = {}
     if ::File.extname(new_resource.world).eql?('') && ::File.basename(new_resource.world).eql?('download')
-      headers = {"Referer" => "#{::File.dirname(new_resource.world)}"}
+      headers = {"Referer" => ::File.dirname(new_resource.world)}
     end
     remote_file "#{new_resource.path}/#{new_resource.name}/world.zip" do
       source new_resource.world
@@ -155,20 +169,25 @@ end
 
 action :update do
   minecraft_service "#{new_resource.name}_stop" do
-    service_name "#{new_resource.name}"
+    service_name new_resource.name
     action :stop
   end
-
-  build_tools 'create jar' do
-    version new_resource.version
-    update_jar new_resource.update_jar
-    action :build
+  if new_resource.jar_source.eql? ''
+    build_tools 'create jar' do
+      version new_resource.version
+      update_jar new_resource.update_jar
+      action :build
+    end
   end
 
-  minecraft_service "#{new_resource.name}" do
+  minecraft_service new_resource.name do
     owner new_resource.owner
     group new_resource.group
-    jar_name lazy { "spigot-#{node['spigot']['current_version']}" }
+    if new_resource.jar_source.eql? ''
+      jar_name lazy { "spigot-#{node['spigot']['current_version']}" }
+    else
+      jar_name 'spigot'
+    end
     path new_resource.path
     action :update
   end
@@ -183,16 +202,27 @@ action :update do
         end
       end
       unless jar.eql? ''
-        unless jar.eql? "spigot-#{node['spigot']['current_version']}.jar"
+        if jar.eql? "spigot-#{node['spigot']['current_version']}.jar"
+          ::FileUtils.rm("#{new_resource.path}/#{new_resource.name}/#{jar}")
+        elsif jar.eql? 'spigot.jar'
           ::FileUtils.rm("#{new_resource.path}/#{new_resource.name}/#{jar}")
         end
       end
     end
   end
 
-  ruby_block 'copy jar' do
-    block do
-      ::FileUtils.cp("#{new_resource.build_tools_dir}/spigot-#{node['spigot']['current_version']}.jar", "#{new_resource.path}/#{new_resource.name}")
+  if new_resource.jar_source.eql? ''
+    ruby_block 'copy jar' do
+      block do
+        ::FileUtils.cp("#{new_resource.build_tools_dir}/spigot-#{node['spigot']['current_version']}.jar", "#{new_resource.path}/#{new_resource.name}")
+      end
+    end
+  else
+    remote_file "#{new_resource.path}/#{new_resource.name}/spigot.jar" do
+      source new_resource.jar_source
+      owner new_resource.owner
+      group new_resource.group
+      action :create
     end
   end
 
@@ -216,7 +246,7 @@ action :update do
 
       headers = {}
       if ::File.extname(new_resource.world).eql?('') && ::File.basename(new_resource.world).eql?('download')
-        headers = {"Referer" => "#{::File.dirname(new_resource.world)}"}
+        headers = {"Referer" => ::File.dirname(new_resource.world)}
       end
       remote_file "#{new_resource.path}/#{new_resource.name}/world.zip" do
         source new_resource.world
@@ -263,18 +293,18 @@ action :update do
   end
 
   minecraft_service "#{new_resource.name}_start" do
-    service_name "#{new_resource.name}"
+    service_name new_resource.name
     action :start
   end
 end
 
 action :delete do
   minecraft_service "#{new_resource.name}_stop" do
-    service_name "#{new_resource.name}"
+    service_name new_resource.name
     action :stop
   end
 
-  minecraft_service "#{new_resource.name}" do
+  minecraft_service new_resource.name do
     action :delete
   end
 
