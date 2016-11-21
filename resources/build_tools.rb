@@ -14,7 +14,7 @@ default_action :nothing
 action_class do
   def get_latest_version
     versions = []
-    ::Dir.entries("#{new_resource.path}").each do |file|
+    ::Dir.entries(new_resource.path).each do |file|
       unless file.eql? 'BuildTools.jar'
         if ::File.extname(file).eql?('.jar') && ::File.basename(file).include?('spigot-')
           versions.push(file)
@@ -54,11 +54,11 @@ action_class do
 end
 
 action :install do
-  directory "#{new_resource.path}" do
+  directory new_resource.path do
     owner new_resource.owner
     group new_resource.group
     action :create
-    not_if { ::Dir.exist?("#{new_resource.path}") }
+    not_if { ::Dir.exist?(new_resource.path) }
   end
 
   remote_file "#{new_resource.path}/BuildTools.jar" do
@@ -71,11 +71,11 @@ action :install do
 end
 
 action :update do
-  directory "#{new_resource.path}" do
+  directory new_resource.path do
     owner new_resource.owner
     group new_resource.group
     action :create
-    not_if { ::Dir.exist?("#{new_resource.path}") }
+    not_if { ::Dir.exist?(new_resource.path) }
   end
 
   remote_file "#{new_resource.path}/BuildTools.jar" do
@@ -87,20 +87,19 @@ action :update do
 end
 
 action :delete do
-  directory "#{new_resource.path}" do
+  directory new_resource.path do
     owner new_resource.owner
     group new_resource.group
     recursive true
     action :delete
-    only_if { ::Dir.exist?("#{new_resource.path}") }
+    only_if { ::Dir.exist?(new_resource.path) }
   end
 end
 
 action :build do
-  unless ::File.exist?("#{new_resource.path}/BuildTools.jar")
-    build_tools 'install' do
-      action :install
-    end
+  build_tools 'install' do
+    action :install
+    not_if { ::File.exist?("#{new_resource.path}/BuildTools.jar") }
   end
 
   current_version = nil
@@ -113,7 +112,7 @@ action :build do
 
   if new_resource.version.eql?('latest') || new_resource.update_jar || !::File.exist?("#{new_resource.path}/spigot-#{current_version}.jar")
     bash "Build v#{new_resource.version}" do
-      cwd "#{new_resource.path}"
+      cwd new_resource.path
       code <<-EOH
   java -jar BuildTools.jar --rev #{new_resource.version}
       EOH
@@ -133,13 +132,15 @@ action :build do
       end
     end
 
-    file lazy { "#{new_resource.path}/spigot-#{node['spigot']['current_version']}.jar" } do
+    file 'spigot.jar' do
+      path lazy { "#{new_resource.path}/spigot-#{node['spigot']['current_version']}.jar" }
       owner new_resource.owner
       group new_resource.group
       action :create
     end
 
-    file lazy { "#{new_resource.path}/craftbukkit-#{node['spigot']['current_version']}.jar" } do
+    file 'craftbukkit.jar' do
+      path lazy { "#{new_resource.path}/craftbukkit-#{node['spigot']['current_version']}.jar" }
       owner new_resource.owner
       group new_resource.group
       action :create
@@ -155,8 +156,8 @@ action :build do
     ruby_block 'update working_version' do
       block do
         file = Chef::Util::FileEdit.new("#{new_resource.path}/working_version.txt")
-        file.search_file_replace_line(/[0-9]+\.[0-9]+\.[0-9]+/, "#{lazy { node['spigot']['current_version'] }}")
-        file.insert_line_if_no_match(/[0-9]+\.[0-9]+\.[0-9]+/, "#{lazy { node['spigot']['current_version'] }}")
+        file.search_file_replace_line(/[0-9]+\.[0-9]+\.[0-9]+/, lazy { node['spigot']['current_version'] })
+        file.insert_line_if_no_match(/[0-9]+\.[0-9]+\.[0-9]+/, lazy { node['spigot']['current_version'] })
         file.write_file
       end
     end

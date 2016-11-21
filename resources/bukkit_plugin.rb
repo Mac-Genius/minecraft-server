@@ -22,7 +22,7 @@ action_class do
           ::FileUtils.chown(new_resource.owner, new_resource.group, "#{new_resource.path}/#{new_resource.servers}/plugins")
         end
         unless ::File.exist?("#{new_resource.path}/#{new_resource.servers}/plugins/#{name}.jar")
-          ::FileUtils.cp("/tmp/#{name}.jar", "#{new_resource.path}/#{new_resource.servers}/plugins")
+          ::FileUtils.cp("#{Chef::Config[:file_cache_path]}/#{name}.jar", "#{new_resource.path}/#{new_resource.servers}/plugins")
         end
       end
     else
@@ -33,7 +33,7 @@ action_class do
             ::FileUtils.chown(new_resource.owner, new_resource.group, "#{new_resource.path}/#{server}/plugins")
           end
           unless ::File.exist?("#{new_resource.path}/#{server}/plugins/#{name}.jar")
-            ::FileUtils.cp("/tmp/#{name}.jar", "#{new_resource.path}/#{server}/plugins")
+            ::FileUtils.cp("#{Chef::Config[:file_cache_path]}/#{name}.jar", "#{new_resource.path}/#{server}/plugins")
           end
         end
       end
@@ -59,7 +59,7 @@ action :install do
     source link
     owner new_resource.owner
     group new_resource.group
-    path "/tmp/#{name}.jar"
+    path "#{Chef::Config[:file_cache_path]}/#{name}.jar"
     not_if { ::File.exist?("#{new_resource.path}/#{new_resource.servers}/plugins/#{name}.jar") }
   end
   ruby_block 'copy plugin' do
@@ -68,7 +68,7 @@ action :install do
     end
     not_if { ::File.exist?("#{new_resource.path}/#{new_resource.servers}/plugins/#{name}.jar") }
   end
-  file "/tmp/#{name}.jar" do
+  file "#{Chef::Config[:file_cache_path]}/#{name}.jar" do
     action :delete
     not_if { ::File.exist?("#{new_resource.path}/#{new_resource.servers}/plugins/#{name}.jar") }
   end
@@ -92,14 +92,14 @@ action :update do
     source link
     owner new_resource.owner
     group new_resource.group
-    path "/tmp/#{name}.jar"
+    path "#{Chef::Config[:file_cache_path]}/#{name}.jar"
   end
   ruby_block 'copy plugin' do
     block do
       copy_plugin(name)
     end
   end
-  file "/tmp/#{name}.jar" do
+  file "#{Chef::Config[:file_cache_path]}/#{name}.jar" do
     action :delete
   end
 end
@@ -110,7 +110,7 @@ action :delete do
       servers = new_resource.servers.is_a?(String) ? [new_resource.servers] : new_resource.servers
       servers.each do |server|
         if ::File.exist?("#{new_resource.path}/#{server}") && ::File.exist?("#{new_resource.path}/#{server}/plugins")
-          ::Directory.entries("#{new_resource.path}/#{server}/plugins").each do |file|
+          ::Dir.entries("#{new_resource.path}/#{server}/plugins").each do |file|
             if ::File.extname(file).eql?('.jar')
               matches = /#{new_resource.name}$/i.match(file)
               unless matches.nil?

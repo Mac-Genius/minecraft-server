@@ -29,10 +29,12 @@ action :start do
     ruby_block 'execute commands' do
       block do
         if new_resource.commands.is_a?(String)
-          `su #{new_resource.owner} -c 'screen -S minecraft_#{new_resource.name} -p 0 -X stuff "#{new_resource.commands}^M"'`
+          cmd = Mixlib::ShellOut.new("su #{new_resource.owner} -c 'screen -S minecraft_#{new_resource.name} -p 0 -X stuff \"#{new_resource.commands}^M\"'")
+          cmd.run_command
         else
           new_resource.commands.each do |command|
-            `su #{new_resource.owner} -c 'screen -S minecraft_#{new_resource.name} -p 0 -X stuff "#{command}^M"'`
+            cmd = Mixlib::ShellOut.new("su #{new_resource.owner} -c 'screen -S minecraft_#{new_resource.name} -p 0 -X stuff \"#{command}^M\"'")
+            cmd.run_command
             sleep(new_resource.command_delay.to_i)
           end
         end
@@ -51,10 +53,12 @@ action :stop do
     ruby_block 'execute commands' do
       block do
         if new_resource.commands.is_a?(String)
-          `su #{new_resource.owner} -c 'screen -S minecraft_#{new_resource.name} -p 0 -X stuff "#{new_resource.commands}^M"'`
+          cmd = Mixlib::ShellOut.new("su #{new_resource.owner} -c 'screen -S minecraft_#{new_resource.name} -p 0 -X stuff \"#{new_resource.commands}^M\"'")
+          cmd.run_command
         else
           new_resource.commands.each do |command|
-            `su #{new_resource.owner} -c 'screen -S minecraft_#{new_resource.name} -p 0 -X stuff "#{command}^M"'`
+            cmd = Mixlib::ShellOut.new("su #{new_resource.owner} -c 'screen -S minecraft_#{new_resource.name} -p 0 -X stuff \"#{command}^M\"'")
+            cmd.run_command
             sleep(new_resource.command_delay.to_i)
           end
         end
@@ -134,7 +138,6 @@ action :create do
         cookbook 'minecraft-server'
         variables({
                       :user => new_resource.owner,
-                      :group => new_resource.group,
                       :name => new_resource.service_name,
                       :jar_name => "#{new_resource.jar_name}}.jar",
                       :directory => "#{new_resource.path}/#{new_resource.service_name}"
@@ -173,15 +176,14 @@ action :create do
         source 'minecraft.sh.erb'
         cookbook 'minecraft-server'
         variables(
-          lazy {
-            {
-              :user => new_resource.owner,
-              :group => new_resource.group,
-              :name => new_resource.service_name,
-              :jar_name => "#{new_resource.jar_name}.jar",
-              :directory => "#{new_resource.path}/#{new_resource.service_name}"
+            lazy {
+              {
+                  :user => new_resource.owner,
+                  :name => new_resource.service_name,
+                  :jar_name => "#{new_resource.jar_name}.jar",
+                  :directory => "#{new_resource.path}/#{new_resource.service_name}"
+              }
             }
-          }
         )
         mode '0755'
         not_if { ::File.exist?("/etc/init.d/minecraft_#{new_resource.service_name}") }
@@ -222,7 +224,6 @@ action :update do
         cookbook 'minecraft-server'
         variables({
                       :user => new_resource.owner,
-                      :group => new_resource.group,
                       :name => new_resource.service_name,
                       :jar_name => "#{new_resource.jar_name}}.jar",
                       :directory => "#{new_resource.path}/#{new_resource.service_name}"
@@ -259,13 +260,12 @@ action :update do
         source 'minecraft.sh.erb'
         cookbook 'minecraft-server'
         variables(
-          {
-            :user => new_resource.owner,
-            :group => new_resource.group,
-            :name => new_resource.service_name,
-            :jar_name => "#{new_resource.jar_name}.jar",
-            :directory => "#{new_resource.path}/#{new_resource.service_name}"
-          }
+            {
+                :user => new_resource.owner,
+                :name => new_resource.service_name,
+                :jar_name => "#{new_resource.jar_name}.jar",
+                :directory => "#{new_resource.path}/#{new_resource.service_name}"
+            }
         )
         mode '0755'
       end

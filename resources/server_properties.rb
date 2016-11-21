@@ -67,12 +67,12 @@ action :update do
 
   if ::File.exist?("#{new_resource.path}/#{new_resource.name}/server.properties") && ::File.read("#{new_resource.path}/#{new_resource.name}/server.properties").split('\n').length < 3
     minecraft_service "#{new_resource.name}_start_config_initial" do
-      service_name "#{new_resource.name}"
+      service_name new_resource.name
       action :start
     end
 
     minecraft_service "#{new_resource.name}_stop_config_initial" do
-      service_name "#{new_resource.name}"
+      service_name new_resource.name
       action :stop
     end
   end
