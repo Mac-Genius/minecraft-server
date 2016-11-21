@@ -6,6 +6,7 @@ provides :bukkit_server
 property :build_tools_dir, String, default: '/opt/build_tools'
 property :eula, [String, TrueClass, FalseClass], default: false
 property :group, String, default: 'chefminecraft'
+property :jar_source, String, default: ''
 property :name, String, name_property: 'default'
 property :owner, String, default: 'chefminecraft'
 property :path, String, default: '/opt/minecraft_servers'
@@ -60,26 +61,38 @@ action :create do
     recursive true
     not_if { ::File.exist?("#{new_resource.path}/#{new_resource.name}") }
   end
+  if new_resource.jar_source.eql? ''
+    build_tools 'create jar' do
+      version new_resource.version
+      update_jar new_resource.update_jar
+      path new_resource.build_tools_dir
+      owner new_resource.owner
+      group new_resource.group
+      action :build
+    end
 
-  build_tools 'create jar' do
-    version new_resource.version
-    update_jar new_resource.update_jar
-    path new_resource.build_tools_dir
-    owner new_resource.owner
-    group new_resource.group
-    action :build
-  end
-
-  ruby_block 'copy jar' do
-    block do
-      ::FileUtils.cp("#{new_resource.build_tools_dir}/craftbukkit-#{node['spigot']['current_version']}.jar", "#{new_resource.path}/#{new_resource.name}")
+    ruby_block 'copy jar' do
+      block do
+        ::FileUtils.cp("#{new_resource.build_tools_dir}/craftbukkit-#{node['spigot']['current_version']}.jar", "#{new_resource.path}/#{new_resource.name}")
+      end
+    end
+  else
+    remote_file "#{new_resource.path}/#{new_resource.name}/craftbukkit.jar" do
+      source new_resource.jar_source
+      owner new_resource.owner
+      group new_resource.group
+      action :create
     end
   end
 
   minecraft_service new_resource.name do
     owner new_resource.owner
     group new_resource.group
-    jar_name lazy { "craftbukkit-#{node['spigot']['current_version']}" }
+    if new_resource.jar_source.eql? ''
+      jar_name lazy { "craftbukkit-#{node['spigot']['current_version']}" }
+    else
+      jar_name 'craftbukkit'
+    end
     path new_resource.path
     action :create
   end
@@ -158,17 +171,22 @@ action :update do
     service_name new_resource.name
     action :stop
   end
-
-  build_tools 'create jar' do
-    version new_resource.version
-    update_jar new_resource.update_jar
-    action :build
+  if new_resource.jar_source.eql? ''
+    build_tools 'create jar' do
+      version new_resource.version
+      update_jar new_resource.update_jar
+      action :build
+    end
   end
 
   minecraft_service new_resource.name do
     owner new_resource.owner
     group new_resource.group
-    jar_name lazy { "craftbukkit-#{node['spigot']['current_version']}" }
+    if new_resource.jar_source.eql? ''
+      jar_name lazy { "craftbukkit-#{node['spigot']['current_version']}" }
+    else
+      jar_name 'craftbukkit'
+    end
     path new_resource.path
     action :update
   end
@@ -183,16 +201,27 @@ action :update do
         end
       end
       unless jar.eql? ''
-        unless jar.eql? "craftbukkit-#{node['spigot']['current_version']}.jar"
+        if jar.eql? "craftbukkit-#{node['spigot']['current_version']}.jar"
+          ::FileUtils.rm("#{new_resource.path}/#{new_resource.name}/#{jar}")
+        elsif jar.eql? 'craftbukkit.jar'
           ::FileUtils.rm("#{new_resource.path}/#{new_resource.name}/#{jar}")
         end
       end
     end
   end
 
-  ruby_block 'copy jar' do
-    block do
-      ::FileUtils.cp("#{new_resource.build_tools_dir}/craftbukkit-#{node['spigot']['current_version']}.jar", "#{new_resource.path}/#{new_resource.name}")
+  if new_resource.jar_source.eql? ''
+    ruby_block 'copy jar' do
+      block do
+        ::FileUtils.cp("#{new_resource.build_tools_dir}/craftbukkit-#{node['spigot']['current_version']}.jar", "#{new_resource.path}/#{new_resource.name}")
+      end
+    end
+  else
+    remote_file "#{new_resource.path}/#{new_resource.name}/craftbukkit.jar" do
+      source new_resource.jar_source
+      owner new_resource.owner
+      group new_resource.group
+      action :create
     end
   end
 

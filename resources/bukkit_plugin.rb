@@ -112,7 +112,7 @@ action :delete do
         if ::File.exist?("#{new_resource.path}/#{server}") && ::File.exist?("#{new_resource.path}/#{server}/plugins")
           ::Dir.entries("#{new_resource.path}/#{server}/plugins").each do |file|
             if ::File.extname(file).eql?('.jar')
-              matches = /#{new_resource.name}$/i.match(file)
+              matches = /#{new_resource.name}/i.match(file)
               unless matches.nil?
                 ::FileUtils.rm("#{new_resource.path}/#{server}/plugins/#{file}")
               end
