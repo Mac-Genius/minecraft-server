@@ -26,4 +26,4 @@ suites:
     attributes:
 
 transport:
-  ssh_key: /Users/Mac/.ssh/macgenius
+  ssh_key: /Users/User/.ssh/ssh.pem
