@@ -17,4 +17,5 @@ bin/*
 
 .idea/
 test/integration/fixtures/
-recipes/
+test/integration/default/
+.DS_Store

@@ -1,8 +1,8 @@
-resource_name :bukkit_yml
-provides :bukkit_yml
+resource_name :bungeecord_config_yml
+provides :bungeecord_config_yml
 
 property :group, String, default: 'chefminecraft'
-property :name, String, name_property: 'default'
+property :name, String, name_property: 'bungeecord'
 property :owner, String, default: 'chefminecraft'
 property :path, String, default: '/opt/minecraft_servers'
 property :settings, Hash, default: {}
@@ -15,14 +15,14 @@ action_class do
 end
 
 action :update do
-  if ::File.exist?("#{new_resource.path}/#{new_resource.name}/bukkit.yml")
-    ruby_block 'edit bukkit.yml' do
+  if ::File.exist?("#{new_resource.path}/#{new_resource.name}/config.yml")
+    ruby_block 'edit Bungeecord config.yml' do
       block do
-        old = read_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml")
+        old = read_yml("#{new_resource.path}/#{new_resource.name}/config.yml")
         puts 'old'
         puts old.to_s
-        new = replace_yml(old, new_resource.settings)
-        write_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml", YAML.dump(new))
+        new = replace_yml(old, JSON.load(new_resource.settings.to_json))
+        write_yml("#{new_resource.path}/#{new_resource.name}/config.yml", YAML.dump(new))
       end
       not_if { new_resource.settings.empty? }
     end
@@ -35,13 +35,13 @@ action :update do
       service_name new_resource.name
       action :stop
     end
-    ruby_block 'edit bukkit.yml' do
+    ruby_block 'edit Bungeecord config.yml' do
       block do
-        old = read_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml")
+        old = read_yml("#{new_resource.path}/#{new_resource.name}/config.yml")
         puts 'old'
         puts old.to_json
-        new = replace_yml(old, new_resource.settings)
-        write_yml("#{new_resource.path}/#{new_resource.name}/bukkit.yml", YAML.dump(new))
+        new = replace_yml(old, JSON.load(new_resource.settings.to_json))
+        write_yml("#{new_resource.path}/#{new_resource.name}/config.yml", YAML.dump(new))
       end
       not_if { new_resource.settings.empty? }
     end
@@ -49,7 +49,7 @@ action :update do
 end
 
 action :reset do
-  file "#{new_resource.path}/#{new_resource.name}/bukkit.yml" do
+  file "#{new_resource.path}/#{new_resource.name}/config.yml" do
     action :delete
   end
 end

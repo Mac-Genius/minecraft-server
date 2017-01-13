@@ -9,21 +9,54 @@ platforms:
   - name: centos-7-2-x64
     driver_config:
       size: 2gb
-#  - name: ubuntu-16-04-x64
-#    driver_config:
-#      size: 2gb
-#  - name: ubuntu-14-04-x64
-#    driver_config:
-#      size: 1gb
+  - name: centos-6-x64
+    driver_config:
+      size: 2gb
+  - name: ubuntu-16-04-x64
+    driver_config:
+      size: 2gb
+  - name: ubuntu-14-04-x64
+    driver_config:
+      size: 2gb
 suites:
-  - name: default
-    server_name: cookbook_test
-    vm_hostname: "#{File.basename(Dir.getwd)}_test_kitchen"
+  - name: vanilla_server
+    driver:
+      name: digitalocean
+    driver_config:
+      server_name: "vanilla-server-test-kitchen"
+    includes:
+      - centos-6-x64
+      - centos-7-2-x64
+      - ubuntu-14-04-x64
+      - ubuntu-16-04-x64
 #    encrypted_data_bag_secret_key_path: test/integration/fixtures/encrypted_data_bag_secret
 #    data_bags_path: test/integration/fixtures/data_bags
     run_list:
-      - recipe[minecraft-server::default]
-    attributes:
-
+      - recipe[minecraft-server::install_vanilla_server]
+  - name: spigot_server
+    driver:
+      name: digitalocean
+    driver_config:
+      server_name: spigot-server-test-kitchen
+    includes:
+      - centos-6-x64
+      - centos-7-2-x64
+      - ubuntu-14-04-x64
+      - ubuntu-16-04-x64
+    run_list:
+      - recipe[minecraft-server::install_spigot_server]
+  - name: bungeecord_server
+    driver:
+      name: digitalocean
+    driver_config:
+      server_name: spigot-server-test-kitchen
+      size: 4gb
+    includes:
+      - centos-6-x64
+      - centos-7-2-x64
+      - ubuntu-14-04-x64
+      - ubuntu-16-04-x64
+    run_list:
+      - recipe[minecraft-server::install_bungeecord_server]
 transport:
-  ssh_key: /Users/User/.ssh/ssh.pem
+  ssh_key: /Users/user/.ssh/key

@@ -18,6 +18,7 @@ default_action :create
 action_class do
   require 'net/http'
   require 'json'
+  include Minecraft_Server::Utils
 
   def fetch_version_manifest
     uri = URI.parse('https://launchermeta.mojang.com/mc/game/version_manifest.json')
@@ -204,9 +205,11 @@ chown -R #{new_resource.owner}:#{new_resource.group} world/
 end
 
 action :update do
+  running = is_running(new_resource.name)
   minecraft_service "#{new_resource.name}_stop" do
     service_name new_resource.name
     action :stop
+    only_if { running }
   end
 
   currentVersion = new_resource.version.eql?('latest') ? get_latest_version(new_resource.snapshot) : new_resource.version
@@ -315,6 +318,7 @@ action :update do
   minecraft_service "#{new_resource.name}_start" do
     service_name new_resource.name
     action :start
+    only_if { running }
   end
 end
 

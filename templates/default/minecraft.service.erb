@@ -6,8 +6,8 @@ Type=forking
 User=<%=@user%>
 Group=<%=@group%>
 
-ExecStart=-/usr/bin/screen -dmS minecraft_<%=@name%> sh -c "java -Xms2G -Xmx4G -jar <%=@jar_name%> nogui; exec sh"
-ExecStop=/usr/bin/screen -S minecraft_<%=@name%> -p 0 -X minecraft "stop^M"
+ExecStart=-/usr/bin/screen -dmS minecraft_<%=@name%> sh -c "java -Xms2G -Xmx4G -jar <%=@jar_name%> nogui<%=@add_cmd%>"
+ExecStop=/usr/bin/screen -S minecraft_<%=@name%> -p 0 -X minecraft "<%=@stop_command%>^M"
 WorkingDirectory=<%=@directory%>
 
 [Install]

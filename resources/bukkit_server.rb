@@ -18,6 +18,8 @@ property :world, String, default: ''
 default_action :create
 
 action_class do
+  include Minecraft_Server::Utils
+
   def get_bukkit_version
     unless ::File.exist?("#{new_resource.build_tools_dir}/working_version.txt")
       Chef::Application.fatal!("Failed to find the working_version.txt file in #{build_tools_dir}!", 1)
@@ -167,16 +169,18 @@ chown -R #{new_resource.owner}:#{new_resource.group} world/
 end
 
 action :update do
+  running = is_running(new_resource.name)
   minecraft_service "#{new_resource.name}_stop" do
     service_name new_resource.name
     action :stop
+    only_if { running }
   end
-  if new_resource.jar_source.eql? ''
-    build_tools 'create jar' do
-      version new_resource.version
-      update_jar new_resource.update_jar
-      action :build
-    end
+
+  build_tools 'create jar' do
+    version new_resource.version
+    update_jar new_resource.update_jar
+    action :build
+    only_if { new_resource.jar_source.eql? '' && new_resource.update_jar }
   end
 
   minecraft_service new_resource.name do
@@ -189,6 +193,7 @@ action :update do
     end
     path new_resource.path
     action :update
+    only_if { new_resource.update_jar }
   end
 
   ruby_block 'remove old jar' do
@@ -208,9 +213,10 @@ action :update do
         end
       end
     end
+    only_if { new_resource.jar_source.eql? '' && new_resource.update_jar }
   end
 
-  if new_resource.jar_source.eql? ''
+  if new_resource.jar_source.eql? '' && new_resource.update_jar
     ruby_block 'copy jar' do
       block do
         ::FileUtils.cp("#{new_resource.build_tools_dir}/craftbukkit-#{node['spigot']['current_version']}.jar", "#{new_resource.path}/#{new_resource.name}")
@@ -222,6 +228,7 @@ action :update do
       owner new_resource.owner
       group new_resource.group
       action :create
+      not_if { new_resource.jar_source.eql? '' }
     end
   end
 
@@ -294,6 +301,7 @@ action :update do
   minecraft_service "#{new_resource.name}_start" do
     service_name new_resource.name
     action :start
+    only_if { running }
   end
 end
 

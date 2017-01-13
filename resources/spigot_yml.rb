@@ -11,56 +11,16 @@ default_action :update
 
 action_class do
   require 'yaml'
-
-  def read_yml(file)
-    content = ''
-    filelines = ::IO.readlines(file)
-    filelines.each do |line|
-      unless line[0].eql? '#'
-        content = content + line
-      end
-    end
-    YAML.load(content)
-  end
-
-  def write_yml(file, content)
-    header = ''
-    filelines = ::IO.readlines(file)
-    filelines.each do |line|
-      if line[0].eql? '#'
-        header = header + line
-      end
-    end
-    final = header + "\n#{content}"
-    ::IO.write(file, final)
-  end
-
-  def replace_yml(old, new)
-    new.keys.each do |key|
-      if new[key].is_a?(Hash)
-        unless old[key].nil?
-          old[key] = replace_yml(old[key], new[key])
-        end
-      else
-        unless old[key].nil?
-          unless old[key].eql? new[key]
-            old[key] = new[key]
-          end
-        end
-      end
-    end
-    old
-  end
+  include Minecraft_Server::Utils
 end
 
 action :update do
   if ::File.exist?("#{new_resource.path}/#{new_resource.name}/spigot.yml")
     ruby_block 'edit spigot.yml' do
       block do
-        puts 'here'
         old = read_yml("#{new_resource.path}/#{new_resource.name}/spigot.yml")
+        puts 'old'
         puts old.to_s
-        puts new_resource.settings.to_s
         new = replace_yml(old, new_resource.settings)
         write_yml("#{new_resource.path}/#{new_resource.name}/spigot.yml", YAML.dump(new))
       end
@@ -78,6 +38,8 @@ action :update do
     ruby_block 'edit spigot.yml' do
       block do
         old = read_yml("#{new_resource.path}/#{new_resource.name}/spigot.yml")
+        puts 'old'
+        puts old.to_json
         new = replace_yml(old, new_resource.settings)
         write_yml("#{new_resource.path}/#{new_resource.name}/spigot.yml", YAML.dump(new))
       end

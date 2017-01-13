@@ -39,13 +39,17 @@ action_class do
   def replace_properties(old, new)
     new.keys.each do |key|
       if key.is_a?(Symbol)
-        unless old[key.to_s].nil?
+        if old[key.to_s].nil?
+          old[key.to_s] = new[key]
+        else
           unless old[key.to_s].eql? new[key]
             old[key.to_s] = new[key]
           end
         end
       else
-        unless old[key].nil?
+        if old[key].nil?
+          old[key] = new[key]
+        else
           unless old[key].eql? new[key]
             old[key] = new[key]
           end

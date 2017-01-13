@@ -21,9 +21,10 @@ action_class do
           ::FileUtils.mkdir("#{new_resource.path}/#{new_resource.servers}/plugins")
           ::FileUtils.chown(new_resource.owner, new_resource.group, "#{new_resource.path}/#{new_resource.servers}/plugins")
         end
-        unless ::File.exist?("#{new_resource.path}/#{new_resource.servers}/plugins/#{name}.jar")
-          ::FileUtils.cp("#{Chef::Config[:file_cache_path]}/#{name}.jar", "#{new_resource.path}/#{new_resource.servers}/plugins")
+        if ::File.exist?("#{new_resource.path}/#{new_resource.servers}/plugins/#{name}.jar")
+          ::FileUtils.rm("#{new_resource.path}/#{new_resource.servers}/plugins/#{name}.jar")
         end
+        ::FileUtils.cp("#{Chef::Config[:file_cache_path]}/#{name}.jar", "#{new_resource.path}/#{new_resource.servers}/plugins")
       end
     else
       new_resource.servers.each do |server|
@@ -32,9 +33,10 @@ action_class do
             ::FileUtils.mkdir("#{new_resource.path}/#{server}/plugins")
             ::FileUtils.chown(new_resource.owner, new_resource.group, "#{new_resource.path}/#{server}/plugins")
           end
-          unless ::File.exist?("#{new_resource.path}/#{server}/plugins/#{name}.jar")
-            ::FileUtils.cp("#{Chef::Config[:file_cache_path]}/#{name}.jar", "#{new_resource.path}/#{server}/plugins")
+          if ::File.exist?("#{new_resource.path}/#{new_resource.servers}/plugins/#{name}.jar")
+            ::FileUtils.rm("#{new_resource.path}/#{new_resource.servers}/plugins/#{name}.jar")
           end
+          ::FileUtils.cp("#{Chef::Config[:file_cache_path]}/#{name}.jar", "#{new_resource.path}/#{new_resource.servers}/plugins")
         end
       end
     end
@@ -99,6 +101,7 @@ action :update do
       copy_plugin(name)
     end
   end
+
   file "#{Chef::Config[:file_cache_path]}/#{name}.jar" do
     action :delete
   end
