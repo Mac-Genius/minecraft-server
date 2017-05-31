@@ -6,7 +6,7 @@ description 'Installs/Configures Vanilla, Spigot, Bungeecord, and Bukkit Minecra
 long_description 'Installs/Configures Vanilla, Spigot, Bungeecord, and Bukkit Minecraft servers'
 version '0.1.4'
 
-depends 'java', '~> 1.42.0'
+depends 'java', '~> 1'
 
 source_url 'https://github.com/Mac-Genius/minecraft-server'
 issues_url 'https://github.com/Mac-Genius/minecraft-server/issues'
