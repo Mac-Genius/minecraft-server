@@ -4,7 +4,7 @@ maintainer_email 'jwharrison007@gmail.com'
 license 'Apache 2.0'
 description 'Installs/Configures Vanilla, Spigot, Bungeecord, and Bukkit Minecraft servers'
 long_description 'Installs/Configures Vanilla, Spigot, Bungeecord, and Bukkit Minecraft servers'
-version '0.1.4'
+version '0.1.5'
 
 depends 'java', '~> 1'
 
